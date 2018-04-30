@@ -21,6 +21,7 @@ namespace Negamax
             graphics.PreferredBackBufferWidth = Board.Board.BOARD_DIM * Board.Board.SQUARE_DIM;
             graphics.PreferredBackBufferHeight = Board.Board.BOARD_DIM * Board.Board.SQUARE_DIM;
             Content.RootDirectory = "Content";
+            this.IsMouseVisible = true;
         }
 
         /// <summary>
@@ -72,6 +73,10 @@ namespace Negamax
                 Exit();
 
             // TODO: Add your update logic here
+            var mouseState = Mouse.GetState();
+            if (mouseState.LeftButton == ButtonState.Pressed) {
+                mBoard.HandleClick(mouseState.Position);
+            }
 
             base.Update(gameTime);
         }

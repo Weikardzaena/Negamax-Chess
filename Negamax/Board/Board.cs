@@ -106,6 +106,30 @@ namespace Negamax.Board
             }
         }
 
+        public void HandleClick(Point clickLocation)
+        {
+            int yIndex = -1;
+            int xIndex = -1;
+
+            for (UInt16 x = 0; x < BOARD_DIM; x++) {
+                if ((mSquareLocations[x][0].Right > clickLocation.X) &&
+                    (mSquareLocations[x][0].Left <= clickLocation.X)) {
+                    xIndex = x;
+                    break;
+                }
+            }
+            if ((xIndex >= 0) && (xIndex < BOARD_DIM)) {
+                for (UInt16 y = 0; y < BOARD_DIM; y++) {
+                    if ((mSquareLocations[xIndex][y].Top <= clickLocation.Y) &&
+                        (mSquareLocations[xIndex][y].Bottom > clickLocation.Y)) {
+                        yIndex = y;
+                        break;
+                    }
+                }
+            }
+            Console.WriteLine("Got index {0}, {1} for click", xIndex, yIndex);
+        }
+
         public void Dispose()
         {
             // Dispose all Squares:

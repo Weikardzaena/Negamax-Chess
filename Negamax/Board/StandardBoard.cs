@@ -152,7 +152,7 @@ namespace Negamax.Board
                     if ((mSelectedSquare.X != xIndex) || (mSelectedSquare.Y != yIndex)) {
 
                         // TODO:  Check if this square is a valid move.
-                        // TODO:  Apply move
+                        mCurrentState.ApplyMove(new Move(mSelectedSquare.X, mSelectedSquare.Y, xIndex, yIndex));
                     }
 
                     // Don't forget to deselect the square!

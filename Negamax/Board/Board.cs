@@ -35,6 +35,7 @@ namespace Negamax.Board
 
         private Texture2D T_SquareDark;
         private Texture2D T_SquareLight;
+        private Texture2D T_SquareSelected;
 
         /// <summary>
         /// Public constructor
@@ -58,6 +59,7 @@ namespace Negamax.Board
 
             T_SquareDark = contentManager.Load<Texture2D>(BOARD_PATH + "Square_Dark");
             T_SquareLight = contentManager.Load<Texture2D>(BOARD_PATH + "Square_Light");
+            T_SquareSelected = contentManager.Load<Texture2D>(BOARD_PATH + "Square_Selected");
 
             // Create board squares:
             for (UInt16 x = 0; x < 8; x++) {
@@ -101,9 +103,14 @@ namespace Negamax.Board
         /// <param name="spriteBatch">The Began sprite batch.</param>
         public void DrawBoard(SpriteBatch spriteBatch)
         {
-            for (UInt16 x = 0; x < BOARD_DIM; x++) {
-                for (UInt16 y = 0; y < BOARD_DIM; y++) {
-                    mSquares[x][y].DrawSquare(spriteBatch, mSquareLocations[x][y]);
+            if (spriteBatch != null) {
+                for (UInt16 x = 0; x < BOARD_DIM; x++) {
+                    for (UInt16 y = 0; y < BOARD_DIM; y++) {
+                        mSquares[x][y].DrawSquare(spriteBatch, mSquareLocations[x][y]);
+                    }
+                }
+                if (mSelectedSquare != null) {
+                    spriteBatch.Draw(T_SquareSelected, mSquareLocations[mSelectedSquare.Item1][mSelectedSquare.Item2], Color.White);
                 }
             }
         }

@@ -20,8 +20,8 @@ namespace Negamax
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
-            graphics.PreferredBackBufferWidth = StandardBoard.BOARD_DIM * Board.StandardBoard.SQUARE_DIM;
-            graphics.PreferredBackBufferHeight = StandardBoard.BOARD_DIM * Board.StandardBoard.SQUARE_DIM;
+            graphics.PreferredBackBufferWidth = (StandardBoard.BOARD_DIM + 1) * Board.StandardBoard.SQUARE_DIM;
+            graphics.PreferredBackBufferHeight = (StandardBoard.BOARD_DIM + 1) * Board.StandardBoard.SQUARE_DIM;
             Content.RootDirectory = "Content";
             this.IsMouseVisible = true;
         }

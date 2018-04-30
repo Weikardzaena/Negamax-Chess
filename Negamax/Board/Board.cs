@@ -110,6 +110,8 @@ namespace Negamax.Board
 
         public void HandleClick(Point clickLocation)
         {
+            /* This section checks for which square the user clicked on. */
+
             bool foundX = false;
             bool foundY = false;
             UInt16 yIndex = 0;

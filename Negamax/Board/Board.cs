@@ -151,13 +151,23 @@ namespace Negamax.Board
                         mSelectedSquare = mSquares[xIndex][yIndex];
                     }
                 } else {
-                    // TODO:  Check if this square is a valid move.
-                    MovePiece(mSelectedSquare, mSquares[xIndex][yIndex]);
+                    if ((mSelectedSquare.X != xIndex) || (mSelectedSquare.Y != yIndex)) {
+
+                        // TODO:  Check if this square is a valid move.
+                        MovePiece(mSelectedSquare, mSquares[xIndex][yIndex]);
+                    }
 
                     // Don't forget to deselect the square!
-                    mSelectedSquare = null;
+                    ClearCurrentSelection();
                 }
+            } else {
+                ClearCurrentSelection();
             }
+        }
+
+        public void ClearCurrentSelection()
+        {
+            mSelectedSquare = null;
         }
 
         public void Dispose()
@@ -191,7 +201,27 @@ namespace Negamax.Board
 
         private bool IsMoveValid(Square startSquare, Square endSquare)
         {
-            return false;
+            bool isValidMove = false;
+
+            if (startSquare.IsSquareOccupied) {
+                switch (startSquare.Piece.PieceType) {
+                    case PieceType.Bishop:
+                        break;
+                    case PieceType.King:
+                        break;
+                    case PieceType.Knight:
+                        break;
+                    case PieceType.Pawn:
+                        break;
+                    case PieceType.Queen:
+                        break;
+                    case PieceType.Rook:
+                        break;
+                    default:
+                        break;
+                }
+            }
+            return isValidMove;
         }
 
         /// <summary>

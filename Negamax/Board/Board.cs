@@ -18,6 +18,8 @@ namespace Negamax.Board
         private List<List<Square>> mSquares = new List<List<Square>>();
         private List<List<Rectangle>> mSquareLocations = new List<List<Rectangle>>();
 
+        private Tuple<UInt16, UInt16> mSelectedSquare;
+
         private Texture2D T_BishopWhite;
         private Texture2D T_BishopBlack;
         private Texture2D T_KingWhite;
@@ -108,26 +110,43 @@ namespace Negamax.Board
 
         public void HandleClick(Point clickLocation)
         {
-            int yIndex = -1;
-            int xIndex = -1;
+            bool foundX = false;
+            bool foundY = false;
+            UInt16 yIndex = 0;
+            UInt16 xIndex = 0;
 
             for (UInt16 x = 0; x < BOARD_DIM; x++) {
                 if ((mSquareLocations[x][0].Right > clickLocation.X) &&
                     (mSquareLocations[x][0].Left <= clickLocation.X)) {
                     xIndex = x;
+                    foundX = true;
                     break;
                 }
             }
-            if ((xIndex >= 0) && (xIndex < BOARD_DIM)) {
+            if (foundX) {
                 for (UInt16 y = 0; y < BOARD_DIM; y++) {
                     if ((mSquareLocations[xIndex][y].Top <= clickLocation.Y) &&
                         (mSquareLocations[xIndex][y].Bottom > clickLocation.Y)) {
                         yIndex = y;
+                        foundY = true;
                         break;
                     }
                 }
             }
-            Console.WriteLine("Got index {0}, {1} for click", xIndex, yIndex);
+
+            if (foundX && foundY) {
+                if (mSelectedSquare == null) {
+                    if (mSquares[xIndex][yIndex].IsSquareOccupied) {
+                        mSelectedSquare = new Tuple<UInt16, UInt16>(xIndex, yIndex);
+                    }
+                } else {
+                    // TODO:  Check if this square is a valid move.
+                    MovePiece(mSelectedSquare, new Tuple<ushort, ushort>(xIndex, yIndex));
+
+                    // Don't forget to deselect the square!
+                    mSelectedSquare = null;
+                }
+            }
         }
 
         public void Dispose()
@@ -157,6 +176,20 @@ namespace Negamax.Board
 
             T_SquareDark = null;
             T_SquareLight = null;
+        }
+
+        /// <summary>
+        /// Moves the piece from the start location to the end location.
+        /// </summary>
+        /// <remarks>
+        /// This method assumes a valid move!
+        /// </remarks>
+        /// <param name="start">The starting square.</param>
+        /// <param name="end">The ending square.</param>
+        private void MovePiece(Tuple<UInt16, UInt16> start, Tuple<UInt16, UInt16> end)
+        {
+            mSquares[end.Item1][end.Item2].ReplacePiece(mSquares[start.Item1][start.Item2].Piece);
+            mSquares[start.Item1][start.Item2].RemovePiece();
         }
 
         /// <summary>

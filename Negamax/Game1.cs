@@ -13,6 +13,7 @@ namespace Negamax
         SpriteBatch spriteBatch;
 
         const string PIECES_PATH = @".\Assets\Pieces\";
+        const string BOARD_PATH = @".\Assets\Board\";
 
         Texture2D T_BishopWhite;
         Texture2D T_BishopBlack;
@@ -26,6 +27,9 @@ namespace Negamax
         Texture2D T_QueenBlack;
         Texture2D T_RookWhite;
         Texture2D T_RookBlack;
+
+        Texture2D T_SquareDark;
+        Texture2D T_SquareLight;
 
         public Game1()
         {
@@ -67,6 +71,9 @@ namespace Negamax
             T_QueenBlack = Content.Load<Texture2D>(PIECES_PATH + "Queen_Black");
             T_RookWhite = Content.Load<Texture2D>(PIECES_PATH + "Rook_White");
             T_RookBlack = Content.Load<Texture2D>(PIECES_PATH + "Rook_Black");
+
+            T_SquareDark = Content.Load<Texture2D>(BOARD_PATH + "Square_Dark");
+            T_SquareLight = Content.Load<Texture2D>(BOARD_PATH + "Square_Light");
         }
 
         /// <summary>
@@ -89,6 +96,9 @@ namespace Negamax
             T_QueenBlack = null;
             T_RookWhite = null;
             T_RookBlack = null;
+
+            T_SquareDark = null;
+            T_SquareLight = null;
 
             Content.Unload();
         }
@@ -118,7 +128,8 @@ namespace Negamax
 
             // TODO: Add your drawing code here
             spriteBatch.Begin();
-            spriteBatch.Draw(T_QueenBlack, new Rectangle(new Point(0), new Point(60)), Color.Black);
+            spriteBatch.Draw(T_SquareDark, new Rectangle(new Point(0), new Point(60)), Color.White);
+            spriteBatch.Draw(T_SquareLight, new Rectangle(new Point(60), new Point(60)), Color.White);
             spriteBatch.End();
 
             base.Draw(gameTime);

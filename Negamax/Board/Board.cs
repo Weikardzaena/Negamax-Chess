@@ -9,7 +9,7 @@ namespace Negamax.Board
 {
     class StandardBoard : IDisposable
     {
-        public const UInt16 SQUARE_DIM = 60;
+        public const UInt16 SQUARE_DIM = 80;
         public const UInt16 BOARD_DIM = 8;
 
         private const string PIECES_PATH = @".\Assets\Pieces\";
@@ -126,19 +126,17 @@ namespace Negamax.Board
             UInt16 yIndex = 0;
             UInt16 xIndex = 0;
 
-            for (UInt16 x = 0; x < BOARD_DIM; x++) {
-                if ((mSquareLocations[x][0].Right > clickLocation.X) &&
-                    (mSquareLocations[x][0].Left <= clickLocation.X)) {
-                    xIndex = x;
+            for (xIndex = 0; xIndex < BOARD_DIM; xIndex++) {
+                if ((mSquareLocations[xIndex][0].Right > clickLocation.X) &&
+                    (mSquareLocations[xIndex][0].Left <= clickLocation.X)) {
                     foundX = true;
                     break;
                 }
             }
             if (foundX) {
-                for (UInt16 y = 0; y < BOARD_DIM; y++) {
-                    if ((mSquareLocations[xIndex][y].Top <= clickLocation.Y) &&
-                        (mSquareLocations[xIndex][y].Bottom > clickLocation.Y)) {
-                        yIndex = y;
+                for (yIndex = 0; yIndex < BOARD_DIM; yIndex++) {
+                    if ((mSquareLocations[xIndex][yIndex].Top <= clickLocation.Y) &&
+                        (mSquareLocations[xIndex][yIndex].Bottom > clickLocation.Y)) {
                         foundY = true;
                         break;
                     }

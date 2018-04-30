@@ -13,6 +13,7 @@ namespace Negamax
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+        MouseState mPrevMouseState;
 
         StandardBoard mBoard;
 
@@ -74,10 +75,13 @@ namespace Negamax
                 Exit();
 
             // TODO: Add your update logic here
-            var mouseState = Mouse.GetState();
-            if (mouseState.LeftButton == ButtonState.Pressed) {
-                mBoard.HandleClick(mouseState.Position);
+            var newMouseState = Mouse.GetState();
+            if ((newMouseState.LeftButton == ButtonState.Pressed) &&
+                (mPrevMouseState.LeftButton == ButtonState.Released)) {
+                mBoard.HandleClick(newMouseState.Position);
             }
+
+            mPrevMouseState = newMouseState;
 
             base.Update(gameTime);
         }

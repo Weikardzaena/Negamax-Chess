@@ -15,8 +15,11 @@ namespace Negamax.Board
         private const string PIECES_PATH = @".\Assets\Pieces\";
         private const string BOARD_PATH = @".\Assets\Board\";
 
-        private List<List<Square>> mSquares = new List<List<Square>>();
-        private List<List<Rectangle>> mSquareLocations = new List<List<Rectangle>>();
+        private BoardState mCurrentState = new BoardState();
+        private BoardState mPreviousState;
+
+        private Square[,] mSquares = new Square[BOARD_DIM, BOARD_DIM];
+        private Rectangle[,] mSquareLocations = new Rectangle[BOARD_DIM, BOARD_DIM];
 
         private Square mSelectedSquare;
 
@@ -63,30 +66,25 @@ namespace Negamax.Board
 
             // Create board squares:
             for (UInt16 x = 0; x < 8; x++) {
-
-                // Initialize rows entries first:
-                mSquares.Add(new List<Square>(BOARD_DIM));
-                mSquareLocations.Add(new List<Rectangle>(BOARD_DIM));
-
                 for (UInt16 y = 0; y < 8; y++) {
                     // Initialize the square with the appropriate color:
                     if ((y % 2) == 0) {
                         if ((x % 2) == 0) {
-                            mSquares[x].Add(new Square(T_SquareDark, x, y));
+                            mSquares[x, y] = new Square(T_SquareDark, x, y);
                         } else {
-                            mSquares[x].Add(new Square(T_SquareLight, x, y));
+                            mSquares[x, y] = new Square(T_SquareLight, x, y);
                         }
                     } else {
                         // Note the reverse order of the square color:
                         if ((x % 2) == 0) {
-                            mSquares[x].Add(new Square(T_SquareLight, x, y));
+                            mSquares[x, y] = new Square(T_SquareLight, x, y);
                         } else {
-                            mSquares[x].Add(new Square(T_SquareDark, x, y));
+                            mSquares[x, y] = new Square(T_SquareDark, x, y);
                         }
                     }
 
                     // Initialize the positions of the squares:
-                    mSquareLocations[x].Add(new Rectangle(new Point(x * SQUARE_DIM, (BOARD_DIM - 1 - y) * SQUARE_DIM), new Point(SQUARE_DIM)));
+                    mSquareLocations[x, y] = new Rectangle(new Point(x * SQUARE_DIM, (BOARD_DIM - 1 - y) * SQUARE_DIM), new Point(SQUARE_DIM));
                 }
             }
 
@@ -106,13 +104,15 @@ namespace Negamax.Board
             if (spriteBatch != null) {
                 for (UInt16 x = 0; x < BOARD_DIM; x++) {
                     for (UInt16 y = 0; y < BOARD_DIM; y++) {
-                        mSquares[x][y].DrawSquare(spriteBatch, mSquareLocations[x][y]);
+                        mSquares[x, y].DrawSquare(spriteBatch, mSquareLocations[x, y]);
+                        if (mCurrentState.PieceAt(x, y) != null)
+                            mCurrentState.PieceAt(x, y).DrawPiece(spriteBatch, mSquareLocations[x, y]);
                     }
                 }
 
                 // Draw the visual indicator over the selected square:
                 if (mSelectedSquare != null) {
-                    spriteBatch.Draw(T_SquareSelected, mSquareLocations[mSelectedSquare.X][mSelectedSquare.Y], Color.White);
+                    spriteBatch.Draw(T_SquareSelected, mSquareLocations[mSelectedSquare.X, mSelectedSquare.Y], Color.White);
                 }
             }
         }
@@ -127,16 +127,16 @@ namespace Negamax.Board
             UInt16 xIndex = 0;
 
             for (xIndex = 0; xIndex < BOARD_DIM; xIndex++) {
-                if ((mSquareLocations[xIndex][0].Right > clickLocation.X) &&
-                    (mSquareLocations[xIndex][0].Left <= clickLocation.X)) {
+                if ((mSquareLocations[xIndex, 0].Right > clickLocation.X) &&
+                    (mSquareLocations[xIndex, 0].Left <= clickLocation.X)) {
                     foundX = true;
                     break;
                 }
             }
             if (foundX) {
                 for (yIndex = 0; yIndex < BOARD_DIM; yIndex++) {
-                    if ((mSquareLocations[xIndex][yIndex].Top <= clickLocation.Y) &&
-                        (mSquareLocations[xIndex][yIndex].Bottom > clickLocation.Y)) {
+                    if ((mSquareLocations[xIndex, yIndex].Top <= clickLocation.Y) &&
+                        (mSquareLocations[xIndex, yIndex].Bottom > clickLocation.Y)) {
                         foundY = true;
                         break;
                     }
@@ -145,14 +145,14 @@ namespace Negamax.Board
 
             if (foundX && foundY) {
                 if (mSelectedSquare == null) {
-                    if (mSquares[xIndex][yIndex].IsSquareOccupied) {
-                        mSelectedSquare = mSquares[xIndex][yIndex];
+                    if (mCurrentState.PieceAt(xIndex, yIndex) != null) {
+                        mSelectedSquare = mSquares[xIndex, yIndex];
                     }
                 } else {
                     if ((mSelectedSquare.X != xIndex) || (mSelectedSquare.Y != yIndex)) {
 
                         // TODO:  Check if this square is a valid move.
-                        MovePiece(mSelectedSquare, mSquares[xIndex][yIndex]);
+                        // TODO:  Apply move
                     }
 
                     // Don't forget to deselect the square!
@@ -171,11 +171,9 @@ namespace Negamax.Board
         public void Dispose()
         {
             // Dispose all Squares:
-            foreach (var row in mSquares) {
-                foreach (var square in row) {
-                    if (square != null) {
-                        square.Dispose();
-                    }
+            foreach (var square in mSquares) {
+                if (square != null) {
+                    square.Dispose();
                 }
             }
 
@@ -197,85 +195,46 @@ namespace Negamax.Board
             T_SquareLight = null;
         }
 
-        private bool IsMoveValid(Square startSquare, Square endSquare)
-        {
-            bool isValidMove = false;
-
-            if (startSquare.IsSquareOccupied) {
-                switch (startSquare.Piece.PieceType) {
-                    case PieceType.Bishop:
-                        break;
-                    case PieceType.King:
-                        break;
-                    case PieceType.Knight:
-                        break;
-                    case PieceType.Pawn:
-                        break;
-                    case PieceType.Queen:
-                        break;
-                    case PieceType.Rook:
-                        break;
-                    default:
-                        break;
-                }
-            }
-            return isValidMove;
-        }
-
-        /// <summary>
-        /// Moves the piece from the start location to the end location.
-        /// </summary>
-        /// <remarks>
-        /// This method assumes a valid move!
-        /// </remarks>
-        /// <param name="startSquare">The starting square.</param>
-        /// <param name="endSquare">The ending square.</param>
-        private void MovePiece(Square startSquare, Square endSquare)
-        {
-            endSquare.ReplacePiece(startSquare.Piece);
-            startSquare.RemovePiece();
-        }
-
         /// <summary>
         /// Sets all the pieces to their beginning states.
         /// </summary>
         private void SetupBoard()
         {
-            mSquares[0][0].AddPiece(new Piece(T_RookWhite, PieceColor.White, PieceType.Rook));
-            mSquares[1][0].AddPiece(new Piece(T_KnightWhite, PieceColor.White, PieceType.Knight));
-            mSquares[2][0].AddPiece(new Piece(T_BishopWhite, PieceColor.White, PieceType.Bishop));
-            mSquares[3][0].AddPiece(new Piece(T_QueenWhite, PieceColor.White, PieceType.Queen));
-            mSquares[4][0].AddPiece(new Piece(T_KingWhite, PieceColor.White, PieceType.King));
-            mSquares[5][0].AddPiece(new Piece(T_BishopWhite, PieceColor.White, PieceType.Bishop));
-            mSquares[6][0].AddPiece(new Piece(T_KnightWhite, PieceColor.White, PieceType.Knight));
-            mSquares[7][0].AddPiece(new Piece(T_RookWhite, PieceColor.White, PieceType.Rook));
+            mCurrentState.AddPieceToBoard(new Piece(T_RookWhite, PieceColor.White, PieceType.Rook), 0, 0);
+            mCurrentState.AddPieceToBoard(new Piece(T_KnightWhite, PieceColor.White, PieceType.Knight), 1, 0);
+            mCurrentState.AddPieceToBoard(new Piece(T_BishopWhite, PieceColor.White, PieceType.Bishop), 2, 0);
+            mCurrentState.AddPieceToBoard(new Piece(T_QueenWhite, PieceColor.White, PieceType.Queen), 3, 0);
+            mCurrentState.AddPieceToBoard(new Piece(T_KingWhite, PieceColor.White, PieceType.King), 4, 0);
+            mCurrentState.AddPieceToBoard(new Piece(T_BishopWhite, PieceColor.White, PieceType.Bishop), 5, 0);
+            mCurrentState.AddPieceToBoard(new Piece(T_KnightWhite, PieceColor.White, PieceType.Knight), 6, 0);
+            mCurrentState.AddPieceToBoard(new Piece(T_RookWhite, PieceColor.White, PieceType.Rook), 7, 0);
 
-            mSquares[0][1].AddPiece(new Piece(T_PawnWhite, PieceColor.White, PieceType.Pawn));
-            mSquares[1][1].AddPiece(new Piece(T_PawnWhite, PieceColor.White, PieceType.Pawn));
-            mSquares[2][1].AddPiece(new Piece(T_PawnWhite, PieceColor.White, PieceType.Pawn));
-            mSquares[3][1].AddPiece(new Piece(T_PawnWhite, PieceColor.White, PieceType.Pawn));
-            mSquares[4][1].AddPiece(new Piece(T_PawnWhite, PieceColor.White, PieceType.Pawn));
-            mSquares[5][1].AddPiece(new Piece(T_PawnWhite, PieceColor.White, PieceType.Pawn));
-            mSquares[6][1].AddPiece(new Piece(T_PawnWhite, PieceColor.White, PieceType.Pawn));
-            mSquares[7][1].AddPiece(new Piece(T_PawnWhite, PieceColor.White, PieceType.Pawn));
+            mCurrentState.AddPieceToBoard(new Piece(T_PawnWhite, PieceColor.White, PieceType.Pawn), 0, 1);
+            mCurrentState.AddPieceToBoard(new Piece(T_PawnWhite, PieceColor.White, PieceType.Pawn), 1, 1);
+            mCurrentState.AddPieceToBoard(new Piece(T_PawnWhite, PieceColor.White, PieceType.Pawn), 2, 1);
+            mCurrentState.AddPieceToBoard(new Piece(T_PawnWhite, PieceColor.White, PieceType.Pawn), 3, 1);
+            mCurrentState.AddPieceToBoard(new Piece(T_PawnWhite, PieceColor.White, PieceType.Pawn), 4, 1);
+            mCurrentState.AddPieceToBoard(new Piece(T_PawnWhite, PieceColor.White, PieceType.Pawn), 5, 1);
+            mCurrentState.AddPieceToBoard(new Piece(T_PawnWhite, PieceColor.White, PieceType.Pawn), 6, 1);
+            mCurrentState.AddPieceToBoard(new Piece(T_PawnWhite, PieceColor.White, PieceType.Pawn), 7, 1);
 
-            mSquares[0][7].AddPiece(new Piece(T_RookBlack, PieceColor.Black, PieceType.Rook));
-            mSquares[1][7].AddPiece(new Piece(T_KnightBlack, PieceColor.Black, PieceType.Knight));
-            mSquares[2][7].AddPiece(new Piece(T_BishopBlack, PieceColor.Black, PieceType.Bishop));
-            mSquares[3][7].AddPiece(new Piece(T_QueenBlack, PieceColor.Black, PieceType.Queen));
-            mSquares[4][7].AddPiece(new Piece(T_KingBlack, PieceColor.Black, PieceType.King));
-            mSquares[5][7].AddPiece(new Piece(T_BishopBlack, PieceColor.Black, PieceType.Bishop));
-            mSquares[6][7].AddPiece(new Piece(T_KnightBlack, PieceColor.Black, PieceType.Knight));
-            mSquares[7][7].AddPiece(new Piece(T_RookBlack, PieceColor.White, PieceType.Rook));
+            mCurrentState.AddPieceToBoard(new Piece(T_RookBlack, PieceColor.Black, PieceType.Rook), 0, 7);
+            mCurrentState.AddPieceToBoard(new Piece(T_KnightBlack, PieceColor.Black, PieceType.Knight), 1, 7);
+            mCurrentState.AddPieceToBoard(new Piece(T_BishopBlack, PieceColor.Black, PieceType.Bishop), 2, 7);
+            mCurrentState.AddPieceToBoard(new Piece(T_QueenBlack, PieceColor.Black, PieceType.Queen), 3, 7);
+            mCurrentState.AddPieceToBoard(new Piece(T_KingBlack, PieceColor.Black, PieceType.King), 4, 7);
+            mCurrentState.AddPieceToBoard(new Piece(T_BishopBlack, PieceColor.Black, PieceType.Bishop), 5, 7);
+            mCurrentState.AddPieceToBoard(new Piece(T_KnightBlack, PieceColor.Black, PieceType.Knight), 6, 7);
+            mCurrentState.AddPieceToBoard(new Piece(T_RookBlack, PieceColor.White, PieceType.Rook), 7, 7);
 
-            mSquares[0][6].AddPiece(new Piece(T_PawnBlack, PieceColor.Black, PieceType.Pawn));
-            mSquares[1][6].AddPiece(new Piece(T_PawnBlack, PieceColor.Black, PieceType.Pawn));
-            mSquares[2][6].AddPiece(new Piece(T_PawnBlack, PieceColor.Black, PieceType.Pawn));
-            mSquares[3][6].AddPiece(new Piece(T_PawnBlack, PieceColor.Black, PieceType.Pawn));
-            mSquares[4][6].AddPiece(new Piece(T_PawnBlack, PieceColor.Black, PieceType.Pawn));
-            mSquares[5][6].AddPiece(new Piece(T_PawnBlack, PieceColor.Black, PieceType.Pawn));
-            mSquares[6][6].AddPiece(new Piece(T_PawnBlack, PieceColor.Black, PieceType.Pawn));
-            mSquares[7][6].AddPiece(new Piece(T_PawnBlack, PieceColor.Black, PieceType.Pawn));
+            mCurrentState.AddPieceToBoard(new Piece(T_PawnBlack, PieceColor.Black, PieceType.Pawn), 0, 6);
+            mCurrentState.AddPieceToBoard(new Piece(T_PawnBlack, PieceColor.Black, PieceType.Pawn), 1, 6);
+            mCurrentState.AddPieceToBoard(new Piece(T_PawnBlack, PieceColor.Black, PieceType.Pawn), 2, 6);
+            mCurrentState.AddPieceToBoard(new Piece(T_PawnBlack, PieceColor.Black, PieceType.Pawn), 3, 6);
+            mCurrentState.AddPieceToBoard(new Piece(T_PawnBlack, PieceColor.Black, PieceType.Pawn), 4, 6);
+            mCurrentState.AddPieceToBoard(new Piece(T_PawnBlack, PieceColor.Black, PieceType.Pawn), 5, 6);
+            mCurrentState.AddPieceToBoard(new Piece(T_PawnBlack, PieceColor.Black, PieceType.Pawn), 6, 6);
+            mCurrentState.AddPieceToBoard(new Piece(T_PawnBlack, PieceColor.Black, PieceType.Pawn), 7, 6);
         }
     }
 }

@@ -41,7 +41,9 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Board\Board.cs" />
+    <Compile Include="Board\BoardState.cs" />
+    <Compile Include="Board\Move.cs" />
+    <Compile Include="Board\StandardBoard.cs" />
     <Compile Include="Board\Piece.cs" />
     <Compile Include="Board\Square.cs" />
     <Compile Include="Game1.cs" />

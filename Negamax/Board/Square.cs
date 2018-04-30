@@ -7,68 +7,20 @@ namespace Negamax.Board
 {
     class Square : IDisposable
     {
-        public Piece Piece { get; private set; }
-        public bool IsSquareOccupied { get { return Piece != null; } }
-
-        public UInt16 X { get; private set; }
-        public UInt16 Y { get; private set; }
-
         private Texture2D mSquareTexture;
 
-        /// <summary>
-        /// Public constructor.
-        /// </summary>
-        /// <param name="squareTexture">The texture to render for the square.</param>
-        public Square(Texture2D squareTexture, UInt16 xPos, UInt16 yPos)
-        {
-            X = xPos;
-            Y = yPos;
-            mSquareTexture = squareTexture;
-        }
+        public ushort X { get; private set; }
+        public ushort Y { get; private set; }
 
         /// <summary>
         /// Public constructor.
         /// </summary>
         /// <param name="squareTexture">The texture to render for the square.</param>
-        /// <param name="piece">The piece on this square.</param>
-        public Square(Texture2D squareTexture, UInt16 xPos, UInt16 yPos, Piece piece)
+        public Square(Texture2D squareTexture, ushort x, ushort y)
         {
-            X = xPos;
-            Y = yPos;
+            X = x;
+            Y = y;
             mSquareTexture = squareTexture;
-            AddPiece(piece);
-        }
-
-        /// <summary>
-        /// Adds a piece to the square if unoccupied.
-        /// </summary>
-        /// <param name="piece">The new piece on the square.</param>
-        /// <returns>True if piece was placed; false if square was occupied.</returns>
-        public bool AddPiece(Piece piece)
-        {
-            if (IsSquareOccupied) {
-                return false;
-            }
-
-            Piece = piece;
-            return true;
-        }
-
-        /// <summary>
-        /// Replaces the piece on this square.
-        /// </summary>
-        /// <param name="piece">The new piece for the square.</param>
-        public void ReplacePiece(Piece piece)
-        {
-            Piece = piece;
-        }
-
-        /// <summary>
-        /// Removes the piece from the square.
-        /// </summary>
-        public void RemovePiece()
-        {
-            Piece = null;
         }
 
         /// <summary>
@@ -83,21 +35,12 @@ namespace Negamax.Board
         {
             if (spriteBatch != null) {
                 spriteBatch.Draw(mSquareTexture, destination, Color.White);
-
-                if (Piece != null) {
-                    Piece.DrawPiece(spriteBatch, destination);
-                }
             }
         }
 
         public void Dispose()
         {
             mSquareTexture = null;
-
-            // Dispose the piece if it exists:
-            if (Piece != null) {
-                Piece.Dispose();
-            }
         }
     }
 }

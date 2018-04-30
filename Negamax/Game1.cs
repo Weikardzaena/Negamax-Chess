@@ -81,6 +81,10 @@ namespace Negamax
                 (mPrevMouseState.LeftButton == ButtonState.Released)) {
                 mBoard.HandleClick(newMouseState.Position);
             }
+            if ((newMouseState.RightButton == ButtonState.Pressed) &&
+                (mPrevMouseState.RightButton == ButtonState.Released)) {
+                mBoard.UndoLastMove();
+            }
 
             mPrevMouseState = newMouseState;
 

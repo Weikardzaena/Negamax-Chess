@@ -16,7 +16,7 @@ namespace Negamax.Board
         private const string BOARD_PATH = @".\Assets\Board\";
 
         private BoardState mCurrentState = new BoardState();
-        private BoardState mPreviousState;
+        private Stack<BoardState> mHistory = new Stack<BoardState>();
 
         private Square[,] mSquares = new Square[BOARD_DIM, BOARD_DIM];
         private Rectangle[,] mSquareLocations = new Rectangle[BOARD_DIM, BOARD_DIM];
@@ -152,6 +152,7 @@ namespace Negamax.Board
                     if ((mSelectedSquare.X != xIndex) || (mSelectedSquare.Y != yIndex)) {
 
                         // TODO:  Check if this square is a valid move.
+                        mHistory.Push(new BoardState(mCurrentState));
                         mCurrentState.ApplyMove(new Move(mSelectedSquare.X, mSelectedSquare.Y, xIndex, yIndex));
                     }
 
@@ -166,6 +167,13 @@ namespace Negamax.Board
         public void ClearCurrentSelection()
         {
             mSelectedSquare = null;
+        }
+
+        public void UndoLastMove()
+        {
+            if (mHistory.Count > 0) {
+                mCurrentState = mHistory.Pop();
+            }
         }
 
         public void Dispose()

@@ -109,6 +109,8 @@ namespace Negamax.Board
                         mSquares[x][y].DrawSquare(spriteBatch, mSquareLocations[x][y]);
                     }
                 }
+
+                // Draw the visual indicator over the selected square:
                 if (mSelectedSquare != null) {
                     spriteBatch.Draw(T_SquareSelected, mSquareLocations[mSelectedSquare.Item1][mSelectedSquare.Item2], Color.White);
                 }

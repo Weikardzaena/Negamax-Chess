@@ -13,13 +13,14 @@ namespace Negamax
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-        Board.Board mBoard;
+
+        StandardBoard mBoard;
 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
-            graphics.PreferredBackBufferWidth = Board.Board.BOARD_DIM * Board.Board.SQUARE_DIM;
-            graphics.PreferredBackBufferHeight = Board.Board.BOARD_DIM * Board.Board.SQUARE_DIM;
+            graphics.PreferredBackBufferWidth = StandardBoard.BOARD_DIM * Board.StandardBoard.SQUARE_DIM;
+            graphics.PreferredBackBufferHeight = StandardBoard.BOARD_DIM * Board.StandardBoard.SQUARE_DIM;
             Content.RootDirectory = "Content";
             this.IsMouseVisible = true;
         }
@@ -48,7 +49,7 @@ namespace Negamax
 
             // ONLY call this during LoadContent, not during Initialize()!
             // `Content` must be ready to go before initializing Board.
-            mBoard = new Board.Board(Content);
+            mBoard = new StandardBoard(Content);
         }
 
         /// <summary>

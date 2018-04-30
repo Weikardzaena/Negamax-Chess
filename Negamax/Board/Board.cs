@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework.Content;
 
 namespace Negamax.Board
 {
-    class Board : IDisposable
+    class StandardBoard : IDisposable
     {
         public const UInt16 SQUARE_DIM = 60;
         public const UInt16 BOARD_DIM = 8;
@@ -38,7 +38,7 @@ namespace Negamax.Board
         /// Public constructor
         /// </summary>
         /// <param name="contentManager">The content manager where the assets are loaded.</param>
-        public Board(ContentManager contentManager)
+        public StandardBoard(ContentManager contentManager)
         {
             // Load textures:
             T_BishopWhite = contentManager.Load<Texture2D>(PIECES_PATH + "Bishop_White");

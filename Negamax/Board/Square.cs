@@ -10,10 +10,9 @@ namespace Negamax.Board
         public Piece Piece { get; private set; }
         public bool IsSquareOccupied { get { return Piece != null; } }
 
-        public UInt16 X { get { return mBoardPos.Item1; } }
-        public UInt16 Y { get { return mBoardPos.Item2; } }
+        public UInt16 X { get; private set; }
+        public UInt16 Y { get; private set; }
 
-        private Tuple<UInt16, UInt16> mBoardPos;
         private Texture2D mSquareTexture;
 
         /// <summary>
@@ -22,7 +21,8 @@ namespace Negamax.Board
         /// <param name="squareTexture">The texture to render for the square.</param>
         public Square(Texture2D squareTexture, UInt16 xPos, UInt16 yPos)
         {
-            mBoardPos = new Tuple<ushort, ushort>(xPos, yPos);
+            X = xPos;
+            Y = yPos;
             mSquareTexture = squareTexture;
         }
 
@@ -33,7 +33,8 @@ namespace Negamax.Board
         /// <param name="piece">The piece on this square.</param>
         public Square(Texture2D squareTexture, UInt16 xPos, UInt16 yPos, Piece piece)
         {
-            mBoardPos = new Tuple<ushort, ushort>(xPos, yPos);
+            X = xPos;
+            Y = yPos;
             mSquareTexture = squareTexture;
             AddPiece(piece);
         }

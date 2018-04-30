@@ -2,6 +2,8 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
+using Negamax.Board;
+
 namespace Negamax
 {
     /// <summary>
@@ -11,10 +13,13 @@ namespace Negamax
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+        Board.Board mBoard;
 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
+            graphics.PreferredBackBufferWidth = Board.Board.BOARD_DIM * Board.Board.SQUARE_DIM;
+            graphics.PreferredBackBufferHeight = Board.Board.BOARD_DIM * Board.Board.SQUARE_DIM;
             Content.RootDirectory = "Content";
         }
 
@@ -40,7 +45,9 @@ namespace Negamax
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            // TODO: use this.Content to load your game content here
+            // ONLY call this during LoadContent, not during Initialize()!
+            // `Content` must be ready to go before initializing Board.
+            mBoard = new Board.Board(Content);
         }
 
         /// <summary>
@@ -50,6 +57,8 @@ namespace Negamax
         protected override void UnloadContent()
         {
             // TODO: Unload any non ContentManager content here
+
+            Content.Unload();
         }
 
         /// <summary>
@@ -76,6 +85,9 @@ namespace Negamax
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             // TODO: Add your drawing code here
+            spriteBatch.Begin();
+                mBoard.DrawBoard(spriteBatch);
+            spriteBatch.End();
 
             base.Draw(gameTime);
         }

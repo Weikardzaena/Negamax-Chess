@@ -1,23 +1,20 @@
 ﻿using System;
+using Negamax.Util;
 
 namespace Negamax.Board
 {
     public struct Move
     {
-        public UInt16 StartX { get; private set; }
-        public UInt16 StartY { get; private set; }
-        public UInt16 EndX { get; private set; }
-        public UInt16 EndY { get; private set; }
+        public UnsignedShortPoint Start { get; private set; }
+        public UnsignedShortPoint End { get; private set; }
 
-        public Move(UInt16 startX,
-                    UInt16 startY,
-                    UInt16 endX,
-                    UInt16 endY)
+        public Move(ushort startX,
+                    ushort startY,
+                    ushort endX,
+                    ushort endY)
         {
-            StartX = startX;
-            StartY = startY;
-            EndX = endX;
-            EndY = endY;
+            Start = new UnsignedShortPoint(startX, startY);
+            End = new UnsignedShortPoint(endX, endY);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace Negamax.Board
 {
@@ -7,6 +8,7 @@ namespace Negamax.Board
         private Piece[,] mPiecesOnBoard;
         private List<Piece> mWhiteCaptures = new List<Piece>();
         private List<Piece> mBlackCaptures = new List<Piece>();
+        private List<Move> mValidMoves = new List<Move>();
 
         public ushort BoardSize { get; private set; }
         public IList<Piece> WhiteCaptures { get { return mWhiteCaptures.AsReadOnly(); } }
@@ -16,6 +18,7 @@ namespace Negamax.Board
         {
             BoardSize = StandardBoard.BOARD_DIM;
             mPiecesOnBoard = new Piece[StandardBoard.BOARD_DIM, StandardBoard.BOARD_DIM];
+            StoreValidMoves();
         }
 
         public BoardState(BoardState other)
@@ -32,13 +35,15 @@ namespace Negamax.Board
 
             mWhiteCaptures.AddRange(other.WhiteCaptures);
             mBlackCaptures.AddRange(other.BlackCaptures);
+
+            StoreValidMoves();
         }
 
         public bool AddPieceToBoard(Piece piece, ushort xPos, ushort yPos)
         {
             bool success = false;
 
-            if ((xPos < BoardSize) && (yPos < BoardSize)) {
+            if (IsPosValid(xPos, yPos)) {
                 if (mPiecesOnBoard[xPos, yPos] == null) {
                     mPiecesOnBoard[xPos, yPos] = piece;
                     success = true;
@@ -50,7 +55,7 @@ namespace Negamax.Board
 
         public void CapturePieceAt(ushort xPos, ushort yPos)
         {
-            if ((xPos < BoardSize) && (yPos < BoardSize)) {
+            if (IsPosValid(xPos, yPos)) {
                 if (mPiecesOnBoard[xPos, yPos] != null) {
                     if (mPiecesOnBoard[xPos, yPos].PieceColor == PieceColor.White) {
                         mBlackCaptures.Add(mPiecesOnBoard[xPos, yPos] );
@@ -65,7 +70,7 @@ namespace Negamax.Board
 
         public Piece PieceAt(ushort xPos, ushort yPos)
         {
-            if ((xPos < BoardSize) && (yPos < BoardSize)) {
+            if (IsPosValid(xPos, yPos)) {
                 return mPiecesOnBoard[xPos, yPos];
             }
             return null;
@@ -80,18 +85,54 @@ namespace Negamax.Board
         /// <param name="move">The move to apply.</param>
         public void ApplyMove(Move move)
         {
-            if ((move.StartX < BoardSize) &&
-                (move.StartY < BoardSize) &&
-                (move.EndX < BoardSize) &&
-                (move.EndY < BoardSize)) {
+            if (IsPosValid(move.Start.X, move.Start.Y) &&
+                IsPosValid(move.End.X, move.End.Y)) {
 
                 // Capture the piece at the destination first:
-                CapturePieceAt(move.EndX, move.EndY);
+                CapturePieceAt(move.End.X, move.End.Y);
 
                 // Move the piece:
-                mPiecesOnBoard[move.EndX, move.EndY] = mPiecesOnBoard[move.StartX, move.StartY];
-                mPiecesOnBoard[move.StartX, move.StartY] = null;
+                mPiecesOnBoard[move.End.X, move.End.Y] = mPiecesOnBoard[move.Start.X, move.Start.Y];
+                mPiecesOnBoard[move.Start.X, move.Start.Y] = null;
             }
+        }
+
+        private void StoreValidMoves()
+        {
+            mValidMoves.Clear();
+
+            for (ushort x = 0; x < BoardSize; x++) {
+                for (ushort y = 0; y < BoardSize; y++) {
+                    if (mPiecesOnBoard[x, y] != null) {
+                        switch (mPiecesOnBoard[x, y].PieceType) {
+                            case PieceType.Bishop:
+                                StoreValidMovesForBishop(mPiecesOnBoard[x, y], x, y);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+
+        private void StoreValidMovesForBishop(Piece bishop, ushort xPos, ushort yPos)
+        {
+            if (IsPosValid(xPos, yPos) && (bishop.PieceType == PieceType.Bishop)) {
+                ushort x = xPos;
+                ushort y = yPos;
+                while ((x++ < BoardSize) && (y++ < BoardSize)) {
+                    if (mPiecesOnBoard[x, y] == null) {
+
+                    }
+                }
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private bool IsPosValid(ushort xPos, ushort yPos)
+        {
+            return (xPos < BoardSize) && (yPos < BoardSize);
         }
     }
 }

@@ -85,18 +85,12 @@ namespace Negamax.Board
                 (move.EndX < BoardSize) &&
                 (move.EndY < BoardSize)) {
 
-                if (mPiecesOnBoard[move.StartX, move.StartY] != null) {
-                    if (mPiecesOnBoard[move.EndX, move.EndY] != null) {
-                        if (mPiecesOnBoard[move.EndX, move.EndY].PieceColor != mPiecesOnBoard[move.StartX, move.StartY].PieceColor) {
-                            CapturePieceAt(move.EndX, move.EndY);
-                            mPiecesOnBoard[move.EndX, move.EndY] = mPiecesOnBoard[move.StartX, move.StartY];
-                            mPiecesOnBoard[move.StartX, move.StartY] = null;
-                        }
-                    } else {
-                        mPiecesOnBoard[move.EndX, move.EndY] = mPiecesOnBoard[move.StartX, move.StartY];
-                        mPiecesOnBoard[move.StartX, move.StartY] = null;
-                    }
-                }
+                // Capture the piece at the destination first:
+                CapturePieceAt(move.EndX, move.EndY);
+
+                // Move the piece:
+                mPiecesOnBoard[move.EndX, move.EndY] = mPiecesOnBoard[move.StartX, move.StartY];
+                mPiecesOnBoard[move.StartX, move.StartY] = null;
             }
         }
     }
